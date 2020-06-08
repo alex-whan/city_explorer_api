@@ -33,6 +33,7 @@ app.get('/location', (request, response) => {
 
     response.status(200).send(returnObj);
 
+  // Error message in case there's an error with the server/API call
   } catch(err){
     console.log('ERROR', err);
     response.status(500).send('Sorry, something went wrong.');
@@ -47,6 +48,8 @@ function Location(searchQuery, obj){
   this.longitude = obj.lon;
 }
 
+
+// Catch-all (*) in case the route cannot be found
 app.get('*', (request, response) => {
   response.status(404).send('Sorry, this route does not exist.');
 })
