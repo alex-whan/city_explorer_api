@@ -39,6 +39,7 @@ app.get('/location', (request, response) => {
   }
 })
 
+// Constructor function to normalize/re-create our JSON data, and ensure that each object is created according to the same format when server receives external data
 function Location(searchQuery, obj){
   this.search_query = searchQuery;
   this.formatted_query = obj.display_name;
