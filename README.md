@@ -24,13 +24,53 @@ API Server for City Explorer Application
 <!-- Give credit (and a link) to other people or resources that helped you build this application. -->
 -->
 
+## User Acceptance Tests
 
-Number and name of feature: ________________________________
+**Number and name of feature:** Feature 1 - Repository Set Up
 
-Estimate of time needed to complete: _____
+**Estimate of time needed to complete:** 30 min
 
-Start time: _____
+**Start time:** 2:30pm
 
-Finish time: _____
+**Finish time:** 3:15pm
 
-Actual time needed to complete: _____
+**Actual time needed to complete:** 45 min
+
+-----
+-----
+
+**Number and name of feature:** Feature 2 - Locations
+
+**Estimate of time needed to complete:** 30 min
+
+**Start time:** 3:25pm
+
+**Finish time:** 4:00pm
+
+**Actual time needed to complete:** 35 min
+
+-----
+-----
+
+**Number and name of feature:** Feature 3 - Weather
+
+**Estimate of time needed to complete:** 1 hr
+
+**Start time:** 4:15pm
+
+**Finish time:**
+
+**Actual time needed to complete:**
+
+-----
+-----
+
+**Number and name of feature:** Feature 4 - Errors
+
+**Estimate of time needed to complete:**  30 min
+
+**Start time:**
+
+**Finish time:**
+
+**Actual time needed to complete:**
