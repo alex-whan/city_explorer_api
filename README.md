@@ -22,6 +22,12 @@ User must run the following library installs in order to build and run this appl
 * `npm i -S dotenv`
 * `npm i -S cors`
 * `npm i -S node` - user must also have Node.js installed
+
+* `npm init` followed by:
+
+          npm install express dotenv cors
+
+
 <!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
 
 ## Architecture
@@ -51,6 +57,8 @@ User must run the following library installs in order to build and run this appl
 -->
 
 ## User Acceptance Tests
+
+## Day 1 (Lab 6)
 
 **Number and name of feature:** Feature 1 - Repository Set Up
 
@@ -100,3 +108,60 @@ User must run the following library installs in order to build and run this appl
 **Finish time:** 6:00pm
 
 **Actual time needed to complete:** 25 min
+
+-----
+
+## Day 2 (Lab 7)
+
+-----
+
+**Number and name of feature:** Feature 1 - Data Formatting with .map()
+
+**Estimate of time needed to complete:**  30 min
+
+**Start time:** 4:30pm
+
+**Finish time:** 4:50pm
+
+**Actual time needed to complete:** 20 min
+
+-----
+-----
+
+**Number and name of feature:** Feature 2 - Locations APIs
+
+**Estimate of time needed to complete:**  1 hr
+
+**Start time:** 5:00pm
+
+**Finish time:**
+
+**Actual time needed to complete:**
+
+-----
+-----
+
+**Number and name of feature:** Feature 3 - Weather APIs
+
+**Estimate of time needed to complete:**  1 hr
+
+**Start time:**
+
+**Finish time:**
+
+**Actual time needed to complete:**
+
+-----
+-----
+
+**Number and name of feature:** Feature 4 - Trails APIs
+
+**Estimate of time needed to complete:** 1 hr
+
+**Start time:**
+
+**Finish time:**
+
+**Actual time needed to complete:**
+
+-----
