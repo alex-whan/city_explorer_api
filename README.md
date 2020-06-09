@@ -5,6 +5,10 @@
 **Author**: Alex Whan
 **Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
 
+**Live Link to Main Page:** https://alex-whan-city-explorer-api.herokuapp.com/
+
+**Trello Project Management Board:** https://trello.com/b/IzRo1UdU/city-explorer
+
 ## Overview
 
 This is an API server for the City Explorer front-end application.
@@ -14,6 +18,15 @@ This is an API server for the City Explorer front-end application.
 <!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
 
 ## Architecture
+
+* Languages: JavaScript, Node.js
+
+* Libraries:
+  - Node.js
+  - Express.js
+  - dotenv.js
+  - cors.js
+
 <!-- Provide a detailed description of the application design. What technologies (languages, libraries, etc) you're using, and any other relevant design information. -->
 
 ## Change Log
