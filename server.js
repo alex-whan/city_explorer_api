@@ -1,5 +1,11 @@
 'use strict';
 
+// Global Error messages
+// 500 error message
+const errorMessage_500 = 'Sorry, something went wrong.';
+// 404 error message 
+const errorMessage_404 = 'Sorry, this route does not exist.';
+
 // Express library sets up our server
 // Bringing in a library takes TWO steps:
   // 1) "Require" it (below)
@@ -31,14 +37,11 @@ app.get('/location', (request, response) => {
 
     let returnObj = new Location(search_query, geoData[0]);
 
-    console.log(returnObj);
-
     response.status(200).send(returnObj);
 
   // Error message in case there's an error with the server/API call
   } catch(err){
-    console.log('LOCATION ERROR', err);
-    response.status(500).send('Sorry, something went wrong.');
+    response.status(500).send(errorMessage_500);
   }
 })
 
@@ -71,8 +74,7 @@ app.get('/weather', (request, response) => {
     response.status(200).send(weatherArray);
 
   } catch(err){
-    console.log('WEATHER ERROR', err);
-    response.status(500).send('Sorry, something went wrong.');
+    response.status(500).send(errorMessage_500);
   }
 })
 
@@ -87,7 +89,7 @@ function Weather(searchQuery, obj){
 
 // Catch-all (*) in case the route cannot be found
 app.get('*', (request, response) => {
-  response.status(404).send('Sorry, this route does not exist.');
+  response.status(404).send(errorMessage_404);
 })
 
 // Fire up the actual server (turn on the lights, move into the house, and start the server)

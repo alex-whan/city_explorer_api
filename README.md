@@ -58,9 +58,9 @@ API Server for City Explorer Application
 
 **Start time:** 4:15pm
 
-**Finish time:**
+**Finish time:** 5:35pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 1 hr 20 min
 
 -----
 -----
@@ -69,8 +69,8 @@ API Server for City Explorer Application
 
 **Estimate of time needed to complete:**  30 min
 
-**Start time:**
+**Start time:** 5:35pm
 
-**Finish time:**
+**Finish time:** 
 
 **Actual time needed to complete:**
