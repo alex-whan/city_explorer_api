@@ -52,14 +52,9 @@ function Location(searchQuery, obj){
 
 app.get('/weather', (request, response) => {
   try{
-    // Empty array to hold weather data
-    let weatherArray = [];
     let search_query = request.query;
     let weatherData = require('./data/weather.json');
-    weatherData.data.forEach(value => {
-      let weatherForecast = new Weather(search_query, value);
-      weatherArray.push(weatherForecast);
-    })
+    let weatherArray = weatherData.data.map(value => new Weather(search_query, value));
     response.status(200).send(weatherArray);
   } catch(err){
     response.status(500).send(errorMessage_500);
