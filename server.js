@@ -31,13 +31,10 @@ app.get('/location', (request, response) => {
 
     let returnObj = new Location(search_query, geoData[0]);
 
-    console.log(returnObj);
-
     response.status(200).send(returnObj);
 
   // Error message in case there's an error with the server/API call
   } catch(err){
-    console.log('LOCATION ERROR', err);
     response.status(500).send('Sorry, something went wrong.');
   }
 })
@@ -71,7 +68,6 @@ app.get('/weather', (request, response) => {
     response.status(200).send(weatherArray);
 
   } catch(err){
-    console.log('WEATHER ERROR', err);
     response.status(500).send('Sorry, something went wrong.');
   }
 })
