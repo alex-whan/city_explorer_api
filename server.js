@@ -25,20 +25,14 @@ app.use(cors());
 // Bring in the PORT by using process.env.variable name
 const PORT = process.env.PORT || 3001;
 
-
 // GET LOCATION DATA
 // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
 app.get('/location', (request, response) => {
   try{
- 
     let search_query = request.query.city;
-
     let geoData = require('./data/location.json');
-
     let returnObj = new Location(search_query, geoData[0]);
-
     response.status(200).send(returnObj);
-
   // Error message in case there's an error with the server/API call
   } catch(err){
     response.status(500).send(errorMessage_500);
@@ -58,26 +52,19 @@ function Location(searchQuery, obj){
 
 app.get('/weather', (request, response) => {
   try{
-    
-    let search_query = request.query;
-
     // Empty array to hold weather data
     let weatherArray = [];
-
+    let search_query = request.query;
     let weatherData = require('./data/weather.json');
-
     weatherData.data.forEach(value => {
       let weatherForecast = new Weather(search_query, value);
       weatherArray.push(weatherForecast);
     })
-
     response.status(200).send(weatherArray);
-
   } catch(err){
     response.status(500).send(errorMessage_500);
   }
 })
-
 
 // Constructor function to normalize/re-create our JSON data from weather.json - taking in the "description" (forecast) and "valid_date" (date) of each daily weather prediction
 function Weather(searchQuery, obj){
@@ -85,7 +72,6 @@ function Weather(searchQuery, obj){
   this.forecast = obj.weather.description;
   this.time = obj.valid_date;
 }
-
 
 // Catch-all (*) in case the route cannot be found
 app.get('*', (request, response) => {

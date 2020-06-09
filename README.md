@@ -1,12 +1,13 @@
-# city_explorer_api
-API Server for City Explorer Application
-
 # Project Name
+
+**City Explorer API**
 
 **Author**: Alex Whan
 **Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
 
 ## Overview
+
+This is an API server for the City Explorer front-end application.
 <!-- Provide a high level overview of what this application is and why you are building it, beyond the fact that it's an assignment for this class. (i.e. What's your problem domain?) -->
 
 ## Getting Started
@@ -71,6 +72,6 @@ API Server for City Explorer Application
 
 **Start time:** 5:35pm
 
-**Finish time:** 
+**Finish time:** 6:00pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 25 min
