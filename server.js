@@ -19,10 +19,12 @@ app.use(cors());
 // Bring in the PORT by using process.env.variable name
 const PORT = process.env.PORT || 3001;
 
-// Use the "app" variable and .get() method to get/return data along /location route and run it through the constructor function to normalize it
+
+// GET LOCATION DATA
+// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
 app.get('/location', (request, response) => {
   try{
-    console.log(request.query.city);
+ 
     let search_query = request.query.city;
 
     let geoData = require('./data/location.json');
@@ -35,7 +37,7 @@ app.get('/location', (request, response) => {
 
   // Error message in case there's an error with the server/API call
   } catch(err){
-    console.log('ERROR', err);
+    console.log('LOCATION ERROR', err);
     response.status(500).send('Sorry, something went wrong.');
   }
 })
@@ -46,6 +48,40 @@ function Location(searchQuery, obj){
   this.formatted_query = obj.display_name;
   this.latitude = obj.lat;
   this.longitude = obj.lon;
+}
+
+// GET WEATHER DATA
+// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it - using a forEach loop
+
+app.get('/weather', (request, response) => {
+  try{
+    
+    let search_query = request.query;
+
+    // Empty array to hold weather data
+    let weatherArray = [];
+
+    let weatherData = require('./data/weather.json');
+
+    weatherData.data.forEach(value => {
+      let weatherForecast = new Weather(search_query, value);
+      weatherArray.push(weatherForecast);
+    })
+
+    response.status(200).send(weatherArray);
+
+  } catch(err){
+    console.log('WEATHER ERROR', err);
+    response.status(500).send('Sorry, something went wrong.');
+  }
+})
+
+
+// Constructor function to normalize/re-create our JSON data from weather.json - taking in the "description" (forecast) and "valid_date" (date) of each daily weather prediction
+function Weather(searchQuery, obj){
+  this.search_query = searchQuery;
+  this.forecast = obj.weather.description;
+  this.time = obj.valid_date;
 }
 
 
