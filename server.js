@@ -12,27 +12,39 @@ const errorMessage_404 = 'Sorry, this route does not exist.';
   // 2) Install it
 const express = require('express');
 
-// Initializes our Express library into our variable called "app"
-const app = express();
+// "Bodyguard" of course server - indicates who is OK to send data to
+const cors = require('cors');
+
+// bring in our SuperAgent library (goes out and gets data from internet)
+const superagent = require('superagent');
 
 // dotenv lets us get our secrets from our .env file
 require('dotenv').config();
 
-// "Bodyguard" of course server - indicates who is OK to send data to
-const cors = require('cors');
-app.use(cors());
+// Initializes our Express library into our variable called "app"
+const app = express();
 
 // Bring in the PORT by using process.env.variable name
 const PORT = process.env.PORT || 3001;
+
+// Tells CORS to let "app" work
+app.use(cors());
+
+// "Location" must happen before Weather/Trails as they rely on its data
 
 // GET LOCATION DATA
 // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
 app.get('/location', (request, response) => {
   try{
-    let search_query = request.query.city;
-    let geoData = require('./data/location.json');
-    let returnObj = new Location(search_query, geoData[0]);
-    response.status(200).send(returnObj);
+    let city = request.query.city;
+    
+    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
+
+    superagent.get(url)
+      .then(resultsFromSuperAgent => {
+        let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
+        response.status(200).send(finalObj);
+      })
   // Error message in case there's an error with the server/API call
   } catch(err){
     response.status(500).send(errorMessage_500);
