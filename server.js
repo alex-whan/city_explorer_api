@@ -30,6 +30,8 @@ const PORT = process.env.PORT || 3001;
 // Tells CORS to let "app" work
 app.use(cors());
 
+//let currentLatLong = [];
+
 // "Location" must happen before Weather/Trails as they rely on its data
 
 // GET LOCATION DATA
@@ -72,13 +74,14 @@ app.get('/weather', (request, response) => {
 
 app.get('/trails', (request, response) => {
   try{
-    let search_query = request.query.search_query;
+    let latitude = request.query.lat;
+    let longitude = request.query.lon;
 
-    let url = `https://AAPI  ${search_query} ${process.env.TRAIL_API_KEY}`
+    let url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&maxDistance=10&key=${process.env.TRAIL_API_KEY}`;
 
     superagent.get(url)
       .then(resultsFromSuperAgent => {
-        let trailArray = resultsFromSuperAgent.body.data.map(trail => new Trail(trail));
+        let trailArray = resultsFromSuperAgent.body.trails.map(trail => new Trail(trail));
         response.status(200).send(trailArray);
       })
     } catch(err){
@@ -107,14 +110,13 @@ function Trail(obj){
   this.location = obj.location;
   this.trailLength = obj.length;
   this.stars = obj.stars;
-  this.star_votes = obj.star_votes;
+  this.star_votes = obj.starVotes;
   this.summary = obj.summary;
-  this.trail_url = obj.trail_url;
-  this.conditions = obj.conditions;
-  this.condition_date = obj.condition_date;
-  this.condition_time = obj.condition_time;
+  this.trail_url = obj.url;
+  this.conditions = obj.conditionStatus;
+  this.condition_date = obj.conditionDate;
+  //this.condition_time = obj.condition_time;
 }
-
 
 // Catch-all (*) in case the route cannot be found
 app.get('*', (request, response) => {
