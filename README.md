@@ -21,11 +21,12 @@ User must run the following library installs in order to build and run this appl
 * `npm i -S express`
 * `npm i -S dotenv`
 * `npm i -S cors`
+* `npm i -S superagent`
 * `npm i -S node` - user must also have Node.js installed
 
 * `npm init` followed by:
 
-          npm install express dotenv cors
+          npm install express dotenv cors superagent
 
 
 <!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
@@ -39,11 +40,18 @@ User must run the following library installs in order to build and run this appl
   - Express.js
   - dotenv.js
   - cors.js
+  - superagent.js
 
 ### Layout of Web Request/Response Cycle (WRRC)
 
-![WRRC](/images/Whiteboard_Lab6.JPG)
 
+#### Day 1 (Lab 6)
+
+![WRRC - Day 1 (Lab 6)](/images/Whiteboard_Lab6.JPG)
+
+#### Day 2 (Lab 7)
+
+![WRRC - Day 2 (Lab 7)](/images/Whiteboard_Lab7.JPG)
 
 <!-- Provide a detailed description of the application design. What technologies (languages, libraries, etc) you're using, and any other relevant design information. -->
 
@@ -147,9 +155,9 @@ User must run the following library installs in order to build and run this appl
 
 **Start time:** 5:40pm
 
-**Finish time:**
+**Finish time:** 6:15pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 35 min
 
 -----
 -----
@@ -158,7 +166,7 @@ User must run the following library installs in order to build and run this appl
 
 **Estimate of time needed to complete:** 1 hr
 
-**Start time:**
+**Start time:** 6:15pm
 
 **Finish time:**
 
