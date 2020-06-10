@@ -70,7 +70,6 @@ app.get('/weather', (request, response) => {
   }
 })
 
-
 // Constructor function to normalize/re-create our JSON data, and ensure that each object is created according to the same format when server receives external data
 function Location(searchQuery, obj){
   this.search_query = searchQuery;
@@ -84,6 +83,20 @@ function Weather(obj){
   this.forecast = obj.weather.description;
   this.time = obj.valid_date;
 }
+
+function Trail(obj){
+  this.name = obj.name;
+  this.location = obj.location;
+  this.trailLength = obj.length;
+  this.stars = obj.stars;
+  this.star_votes = obj.star_votes;
+  this.summary = obj.summary;
+  this.trail_url = obj.trail_url;
+  this.conditions = obj.conditions;
+  this.condition_date = obj.condition_date;
+  this.condition_time = obj.condition_time;
+}
+
 
 // Catch-all (*) in case the route cannot be found
 app.get('*', (request, response) => {
