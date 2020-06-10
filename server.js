@@ -34,7 +34,8 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 
 // Create a client and connect it to that Postgres DB
-
+const client = new pg.Client(process.env.DATABASE_URL);
+client.on('error', err => console.error(err));
 
 
 // "Location" must happen before Weather/Trails as they rely on its data
@@ -129,7 +130,11 @@ app.get('*', (request, response) => {
   response.status(404).send(errorMessage_404);
 })
 
-// Fire up the actual server (turn on the lights, move into the house, and start the server)
-app.listen(PORT, () => {
-  console.log(`Listening on ${PORT}`);
+// Fire up the actual server (turn on the lights, move into the house, and start the server) - and connect to the DB
+
+client.connect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Listening on ${PORT}`); 
+  })
 })
