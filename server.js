@@ -42,7 +42,7 @@ app.get('/location', (request, response) => {
 
     superagent.get(url)
       .then(resultsFromSuperAgent => {
-        let finalObj = new Location(city, resultsFromSuperAgent[0]);
+        let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
         response.status(200).send(finalObj);
       })
   // Error message in case there's an error with the server/API call
