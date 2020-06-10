@@ -38,7 +38,7 @@ app.get('/location', (request, response) => {
   try{
     let city = request.query.city;
     
-    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEO_DATA_API_KEY}&q=${city}&format=json`;
+    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
 
     superagent.get(url)
       .then(resultsFromSuperAgent => {
