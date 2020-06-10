@@ -36,7 +36,10 @@ app.use(cors());
 // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
 app.get('/location', (request, response) => {
   try{
-    let search_query = request.query.city;
+    let city = request.query.city;
+    
+    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEO_DATA_API_KEY}&q=${city}&format=json`;
+
     let geoData = require('./data/location.json');
     let returnObj = new Location(search_query, geoData[0]);
     response.status(200).send(returnObj);
