@@ -40,9 +40,11 @@ app.get('/location', (request, response) => {
     
     let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEO_DATA_API_KEY}&q=${city}&format=json`;
 
-    let geoData = require('./data/location.json');
-    let returnObj = new Location(search_query, geoData[0]);
-    response.status(200).send(returnObj);
+    superagent.get(url)
+      .then(resultsFromSuperAgent => {
+        let finalObj = new Location(city, resultsFromSuperAgent[0]);
+        response.status(200).send(finalObj);
+      })
   // Error message in case there's an error with the server/API call
   } catch(err){
     response.status(500).send(errorMessage_500);
