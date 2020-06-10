@@ -188,18 +188,18 @@ User must run the following library installs in order to build and run this appl
 
 **Start time:** 2:30pm
 
-**Finish time:**
+**Finish time:** 3:20pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 50 min
 
 -----
 -----
 
 **Number and name of feature:** Feature 2 - Server/Database Connection
 
-**Estimate of time needed to complete:**
+**Estimate of time needed to complete:** 1 hr
 
-**Start time:**
+**Start time:** 3:20pm
 
 **Finish time:**
 
