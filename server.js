@@ -77,8 +77,6 @@ app.get('/trails', (request, response) => {
     let longitude = request.query.longitude;
 
     let url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
-    
-    console.log('XYZ', url);
 
     superagent.get(url)
       .then(resultsFromSuperAgent => {
