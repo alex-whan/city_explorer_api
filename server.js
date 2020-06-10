@@ -51,6 +51,26 @@ app.get('/location', (request, response) => {
   }
 })
 
+// GET WEATHER DATA
+// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it - using a forEach loop
+
+app.get('/weather', (request, response) => {
+  try{
+    let search_query = request.query.search_query;
+
+    let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${search_query}&key=${process.env.WEATHER_API_KEY}&days=8`;
+
+    superagent.get(url)
+      .then(resultsFromSuperAgent => {
+        let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
+        response.status(200).send(weatherArray);
+      })
+  } catch(err){
+    response.status(500).send(errorMessage_500);
+  }
+})
+
+
 // Constructor function to normalize/re-create our JSON data, and ensure that each object is created according to the same format when server receives external data
 function Location(searchQuery, obj){
   this.search_query = searchQuery;
@@ -59,23 +79,8 @@ function Location(searchQuery, obj){
   this.longitude = obj.lon;
 }
 
-// GET WEATHER DATA
-// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it - using a forEach loop
-
-app.get('/weather', (request, response) => {
-  try{
-    let search_query = request.query;
-    let weatherData = require('./data/weather.json');
-    let weatherArray = weatherData.data.map(value => new Weather(search_query, value));
-    response.status(200).send(weatherArray);
-  } catch(err){
-    response.status(500).send(errorMessage_500);
-  }
-})
-
 // Constructor function to normalize/re-create our JSON data from weather.json - taking in the "description" (forecast) and "valid_date" (date) of each daily weather prediction
-function Weather(searchQuery, obj){
-  this.search_query = searchQuery;
+function Weather(obj){
   this.forecast = obj.weather.description;
   this.time = obj.valid_date;
 }
