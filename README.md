@@ -147,9 +147,9 @@ User must run the following library installs in order to build and run this appl
 
 **Start time:** 5:40pm
 
-**Finish time:**
+**Finish time:** 6:15pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 35 min
 
 -----
 -----
@@ -158,7 +158,7 @@ User must run the following library installs in order to build and run this appl
 
 **Estimate of time needed to complete:** 1 hr
 
-**Start time:**
+**Start time:** 6:15pm
 
 **Finish time:**
 
