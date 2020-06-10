@@ -44,7 +44,7 @@ app.get('/location', (request, response) => {
       .then(resultsFromSuperAgent => {
         let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
         response.status(200).send(finalObj);
-      })
+      }).catch(err => console.log(err));
   // Error message in case there's an error with the server/API call
   } catch(err){
     response.status(500).send(errorMessage_500);
@@ -62,9 +62,10 @@ app.get('/weather', (request, response) => {
 
     superagent.get(url)
       .then(resultsFromSuperAgent => {
-        let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
+        let weatherArray = resultsFromSuperAgent.body.data.map(day => {return new Weather(day)
+        });
         response.status(200).send(weatherArray);
-      })
+      }).catch(err => console.log(err));
   } catch(err){
     response.status(500).send(errorMessage_500);
   }
@@ -72,15 +73,19 @@ app.get('/weather', (request, response) => {
 
 app.get('/trails', (request, response) => {
   try{
-    let lat = request.query.latitude;
-    let long = request.query.longitude;
-    let url = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${long}&maxDistance=10&key=${process.env.TRAIL_API_KEY}`
+    let latitude = request.query.latitude;
+    let longitude = request.query.longitude;
+
+    let url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
     
+    console.log('XYZ', url);
+
     superagent.get(url)
       .then(resultsFromSuperAgent => {
-        let trailArray = resultsFromSuperAgent.body.trails.map(hike => new Trail(hike));
+        let trailArray = resultsFromSuperAgent.body.trails.map(hike => {return new Trail(hike)
+        });
         response.status(200).send(trailArray);
-      })
+      }).catch(err => console.log(err));
   } catch(err){
       response.status(500).send(errorMessage_500);
   }
@@ -90,8 +95,8 @@ app.get('/trails', (request, response) => {
 function Location(searchQuery, obj){
   this.search_query = searchQuery;
   this.formatted_query = obj.display_name;
-  this.latitude = obj.latitude;
-  this.longitude = obj.longitude;
+  this.latitude = obj.lat;
+  this.longitude = obj.lon;
 }
 
 // Constructor function to normalize/re-create our JSON data from weather.json - taking in the "description" (forecast) and "valid_date" (date) of each daily weather prediction
@@ -104,14 +109,14 @@ function Weather(obj){
 function Trail(obj){
   this.name = obj.name;
   this.location = obj.location;
-  this.trailLength = obj.length;
+  this.length = obj.length;
   this.stars = obj.stars;
-  this.star_votes = obj.star_votes;
+  this.star_votes = obj.starVotes;
   this.summary = obj.summary;
-  this.trail_url = obj.trail_url;
-  this.conditions = obj.condition_status;
-  this.condition_date = obj.condition_date;
-  this.condition_time = obj.condition_time;
+  this.trail_url = obj.url;
+  this.conditions = `${obj.conditionStatus} ${obj.conditionDetails}`;
+  this.condition_date = obj.conditionDate.slice(0, 10);
+  this.condition_time = obj.conditionDate.slice(12, 19);
 }
 
 // Catch-all (*) in case the route cannot be found
