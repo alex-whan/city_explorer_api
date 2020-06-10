@@ -21,6 +21,9 @@ const superagent = require('superagent');
 // dotenv lets us get our secrets from our .env file
 require('dotenv').config();
 
+// bring in and require out pg library (Postgres)
+const pg = require('pg');
+
 // Initializes our Express library into our variable called "app"
 const app = express();
 
@@ -29,6 +32,10 @@ const PORT = process.env.PORT || 3001;
 
 // Tells CORS to let "app" work
 app.use(cors());
+
+// Create a client and connect it to that Postgres DB
+
+
 
 // "Location" must happen before Weather/Trails as they rely on its data
 
