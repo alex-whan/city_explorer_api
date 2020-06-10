@@ -70,6 +70,24 @@ app.get('/weather', (request, response) => {
   }
 })
 
+app.get('/trails', (request, response) => {
+  try{
+    let search_query = request.query.search_query;
+
+    let url = `https://AAPI  ${search_query} ${process.env.TRAIL_API_KEY}`
+
+    superagent.get(url)
+      .then(resultsFromSuperAgent => {
+        let trailArray = resultsFromSuperAgent.body.data.map(trail => new Trail(trail));
+        response.status(200).send(trailArray);
+      })
+    } catch(err){
+      response.status(500).send(errorMessage_500);
+    }
+})
+
+
+
 // Constructor function to normalize/re-create our JSON data, and ensure that each object is created according to the same format when server receives external data
 function Location(searchQuery, obj){
   this.search_query = searchQuery;
