@@ -8,8 +8,7 @@ CREATE TABLE location (
   longitude NUMERIC(10, 7)
 );
 
-INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ('seattle, seattle');
-
+INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ('seattle', 'Seattle, King County, Washington, USA', '47.6038321', '-122.3300624');
 
 -- Write an INSERT statement here
 -- Insert a city that matches searchquery, formatted_query, lat, long

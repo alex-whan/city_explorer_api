@@ -67,20 +67,23 @@ app.get('/location', (request, response) => {
     let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
 
     // See if location already exists in DB
-    let sqlQuery = 'SELECT * FROM location WHERE search_query LIKE ($1);';
+    let sqlQuery = 'SELECT * FROM location WHERE search_query = $1;';
     let safeValue = [city];
 
     client.query(sqlQuery, safeValue)
       .then(sqlResults => {
-        console.log(sqlResults.rows);
         console.log(sqlResults);
-        if (sqlResults.rowCount !== 0){  
+        if (sqlResults.rowCount){   // checks if we get a row count back = true
+          console.log('Getting info from the DATABASE');
           response.status(200).send(sqlResults.rows[0]);
         } else {
           superagent.get(url)
             .then(resultsFromSuperAgent => {
+              console.log('Getting info from the API');
               let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
               let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
+              let safeValues = [city, finalObj.formatted_query, finalObj.lat, finalObj.lon];
+              client.query(sqlQuery, safeValues);
               response.status(200).send(finalObj);
             })
           }
