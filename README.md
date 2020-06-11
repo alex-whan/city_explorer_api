@@ -214,8 +214,8 @@ User must run the following library installs in order to build and run this appl
 
 **Start time:** 6:20pm
 
-**Finish time:**
+**Finish time:** 6:45pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 25 min
 
 -----
