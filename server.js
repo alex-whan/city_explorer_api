@@ -42,7 +42,7 @@ client.on('error', err => console.error(err));
 // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
 app.get('/location', (request, response) => {
     let city = request.query.city;
-    console.log(city);
+    //console.log(city);
     let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
 
     // See if location already exists in DB
@@ -51,7 +51,7 @@ app.get('/location', (request, response) => {
 
     client.query(sqlQuery, safeValue)
       .then(sqlResults => {
-        console.log(sqlResults);
+        //console.log(sqlResults);
         if (sqlResults.rowCount){   // checks if we get a row count back = true
           console.log('Getting info from the DATABASE');
           response.status(200).send(sqlResults.rows[0]);
