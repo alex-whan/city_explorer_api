@@ -82,7 +82,7 @@ app.get('/location', (request, response) => {
               console.log('Getting info from the API');
               let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
               let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
-              let safeValues = [city, finalObj.formatted_query, finalObj.lat, finalObj.lon];
+              let safeValues = [city, finalObj.formatted_query, finalObj.latitude, finalObj.longitude];
               client.query(sqlQuery, safeValues);
               response.status(200).send(finalObj);
             })
