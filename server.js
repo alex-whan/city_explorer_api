@@ -38,30 +38,71 @@ const client = new pg.Client(process.env.DATABASE_URL);
 client.on('error', err => console.error(err));
 
 
-// "Location" must happen before Weather/Trails as they rely on its data
-
 // GET LOCATION DATA
 // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
 app.get('/location', (request, response) => {
-  try{
+
+  // let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude;';
+
+  
+
+  // Need 2 things for a client query with PG library - can't just pass one thing
+
+
+
+  // This is where we need to declare what our SQL statement is going to equal
+  // Need to also declare what our safeValue is
+  // Then going to make our first client.query
+
+
+  // Right after the query, chain a .then() to it and inside of that .then() is where we'll have our if/else check
+  // Cannot just do an IF check - has to be conditional. If it's NOT true, need to perform something else very specific.
+  // If check itself will just say: "If this came back from my query, then I want to return that entire row of info"
+  // Else statement: Put your WHOLE superagent call inside of this (city variable, url, superagent, etc - all of it)
+
+
+  // try{
     let city = request.query.city;
-    
+    console.log(city);
     let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
 
-    superagent.get(url)
-      .then(resultsFromSuperAgent => {
-        let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
-        response.status(200).send(finalObj);
-      }).catch(err => console.log(err));
+    // See if location already exists in DB
+    let sqlQuery = 'SELECT * FROM location WHERE search_query LIKE ($1);';
+    let safeValue = [city];
+
+    client.query(sqlQuery, safeValue)
+      .then(sqlResults => {
+        console.log(sqlResults.rows);
+        console.log(sqlResults);
+        if (sqlResults.rowCount !== 0){  
+          response.status(200).send(sqlResults.rows[0]);
+        } else {
+          superagent.get(url)
+            .then(resultsFromSuperAgent => {
+              let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
+              let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
+              response.status(200).send(finalObj);
+            })
+          }
+        }).catch(err => console.error(err));
+  });
+
+        // BEFORE our response: We're already inside this superagent call because we didn't already have it in our DB
+        // This means we want to do another client query before responding to insert our information into the DB
+        // Essentially: Splitting these things into three functions:
+          // Check DB function
+          // Save to DB function
+          // Get my location function
+          // That could be a full refactor - but you can write them all as one big function for now to get them to work
+
   // Error message in case there's an error with the server/API call
-  } catch(err){
-    response.status(500).send(errorMessage_500);
-  }
-})
+//   } catch(err){
+//     response.status(500).send(errorMessage_500);
+//   }
+// })
 
 // GET WEATHER DATA
 // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it - using a forEach loop
-
 app.get('/weather', (request, response) => {
   try{
     let search_query = request.query.search_query;
@@ -70,8 +111,7 @@ app.get('/weather', (request, response) => {
 
     superagent.get(url)
       .then(resultsFromSuperAgent => {
-        let weatherArray = resultsFromSuperAgent.body.data.map(day => {return new Weather(day)
-        });
+        let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
         response.status(200).send(weatherArray);
       }).catch(err => console.log(err));
   } catch(err){
@@ -79,6 +119,7 @@ app.get('/weather', (request, response) => {
   }
 })
 
+// GET TRAILS DATA
 app.get('/trails', (request, response) => {
   try{
     let latitude = request.query.latitude;
@@ -130,8 +171,7 @@ app.get('*', (request, response) => {
   response.status(404).send(errorMessage_404);
 })
 
-// Fire up the actual server (turn on the lights, move into the house, and start the server) - and connect to the DB
-
+// Fire up the actual server (turn on the lights, move into the house, start the server, and connect to DB
 client.connect()
   .then(() => {
     app.listen(PORT, () => {
