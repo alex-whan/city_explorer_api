@@ -53,6 +53,10 @@ User must run the following library installs in order to build and run this appl
 
 ![WRRC - Day 2 (Lab 7)](/images/Whiteboard_Lab7.JPG)
 
+#### Day 3 (Lab 8)
+
+![WRRC - Day 3 (Lab 8)](/images/Whiteboard_Lab8.JPG)
+
 <!-- Provide a detailed description of the application design. What technologies (languages, libraries, etc) you're using, and any other relevant design information. -->
 
 ## Change Log
@@ -167,6 +171,48 @@ User must run the following library installs in order to build and run this appl
 **Estimate of time needed to complete:** 1 hr
 
 **Start time:** 6:15pm
+
+**Finish time:** 10:15pm
+
+**Actual time needed to complete:** 4 hr
+
+-----
+
+## Day 3 (Lab 8)
+
+-----
+
+**Number and name of feature:** Feature 1 - Database
+
+**Estimate of time needed to complete:**  1 hr
+
+**Start time:** 2:30pm
+
+**Finish time:** 3:20pm
+
+**Actual time needed to complete:** 50 min
+
+-----
+-----
+
+**Number and name of feature:** Feature 2 - Server/Database Connection
+
+**Estimate of time needed to complete:** 1 hr
+
+**Start time:** 3:20pm
+
+**Finish time:** 6:10pm
+
+**Actual time needed to complete:** 2hr 50 min
+
+-----
+-----
+
+**Number and name of feature:** Feature 3 - Heroku Deployment
+
+**Estimate of time needed to complete:** 1 hr
+
+**Start time:** 6:20pm
 
 **Finish time:**
 
