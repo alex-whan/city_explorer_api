@@ -201,18 +201,18 @@ User must run the following library installs in order to build and run this appl
 
 **Start time:** 3:20pm
 
-**Finish time:**
+**Finish time:** 6:10pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 2hr 50 min
 
 -----
 -----
 
 **Number and name of feature:** Feature 3 - Heroku Deployment
 
-**Estimate of time needed to complete:**
+**Estimate of time needed to complete:** 1 hr
 
-**Start time:**
+**Start time:** 6:20pm
 
 **Finish time:**
 
