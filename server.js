@@ -181,7 +181,8 @@ function Location(searchQuery, obj){
 // Weather constructor
 function Weather(obj){
   this.forecast = obj.weather.description;
-  this.time = obj.valid_date;
+  this.time = (new Date(obj.valid_date)).toLocaleDateString(); 
+  // normalizes date to local format
 }
 
 // Trail constructor
@@ -193,9 +194,9 @@ function Trail(obj){
   this.star_votes = obj.starVotes;
   this.summary = obj.summary;
   this.trail_url = obj.url;
-  this.conditions = `${obj.conditionStatus} ${obj.conditionDetails}`;
-  this.condition_date = obj.conditionDate.slice(0, 10);
-  this.condition_time = obj.conditionDate.slice(12, 19);
+  this.conditions = `${obj.conditionStatus}, ${obj.conditionDetails}`;
+  this.condition_date = (new Date(obj.conditionDate)).toLocaleDateString(); // normalizes date to local format
+  this.condition_time = (new Date(obj.conditionDate)).toLocaleTimeString(); // normalizes time to local format
 }
 
 // Movies constructor
@@ -205,7 +206,8 @@ function Movies(obj){
   this.average_votes = obj.vote_average;
   this.total_votes = obj.vote_count;
   this.image_url = `https://image.tmdb.org/t/p/w500${obj.poster_path}`;
-  this.released_on = obj.release_date;
+  this.released_on = (new Date(obj.release_date)).toLocaleDateString(); 
+  // normalizes date to local format
 }
 
 // Yelp Restaurant constructor
