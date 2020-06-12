@@ -6,68 +6,113 @@ const errorMessage_500 = 'Sorry, something went wrong.';
 // 404 error message 
 const errorMessage_404 = 'Sorry, this route does not exist.';
 
-// Express library sets up our server
-// Bringing in a library takes TWO steps:
-  // 1) "Require" it (below)
-  // 2) Install it
+// Set up Express server and initialize Express into variable
 const express = require('express');
+const app = express();
 
-// "Bodyguard" of course server - indicates who is OK to send data to
+// Set up cors
 const cors = require('cors');
+app.use(cors());
 
-// bring in our SuperAgent library (goes out and gets data from internet)
-const superagent = require('superagent');
-
-// dotenv lets us get our secrets from our .env file
+// Set up and configure dotenv
 require('dotenv').config();
 
-// bring in and require out pg library (Postgres)
-const pg = require('pg');
+// Set up superagent
+const superagent = require('superagent');
 
-// Initializes our Express library into our variable called "app"
-const app = express();
+// Set up pg and database to connect to Postgres
+const pg = require('pg');
+const client = new pg.Client(process.env.DATABASE_URL);
+client.on('error', err => console.error(err));
 
 // Bring in the PORT by using process.env.variable name
 const PORT = process.env.PORT || 3001;
 
-// Tells CORS to let "app" work
-app.use(cors());
+// Location route
+app.get('/location', locationHandler);
 
-// Create a client and connect it to that Postgres DB
-const client = new pg.Client(process.env.DATABASE_URL);
-client.on('error', err => console.error(err));
+// Restaurant route
+app.get('/restaurants', restaurantHandler);
 
+// Trails route
+app.get('/trails', trailsHandler);
 
-// GET LOCATION DATA
-// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
-app.get('/location', (request, response) => {
-    let city = request.query.city;
-    //console.log(city);
-    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
+// "Use" will handle any GET, POST, UPDATE, DELETE requests
+app.use('*', handleNotFound);
 
-    // See if location already exists in DB
-    let sqlQuery = 'SELECT * FROM location WHERE search_query = $1;';
-    let safeValue = [city];
+// Location handler
+function locationHandler(request, response){
+  let city = request.query.city;
+  let url = 'https://us1.locationiq.com/v1/search.php';
 
-    client.query(sqlQuery, safeValue)
-      .then(sqlResults => {
-        //console.log(sqlResults);
-        if (sqlResults.rowCount){   // checks if we get a row count back = true
-          console.log('Getting info from the DATABASE');
-          response.status(200).send(sqlResults.rows[0]);
-        } else {
-          superagent.get(url)
-            .then(resultsFromSuperAgent => {
-              console.log('Getting info from the API');
-              let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
+  const queryParams = {
+    key: process.env.GEOCODE_API_KEY,
+    q: city,
+    format: 'json',
+    limit: 1
+  }
+
+  let sqlQuery = 'SELECT * FROM location WHERE search_query = $1;';
+  let safeValue = [city];
+
+  client.query(sqlQuery, safeValue)
+    .then(sqlResults => {
+      if (sqlResults.rowCount){ // checks if we get a row count back
+        console.log('Getting info from the DATABASE');
+        response.status(200).send(sqlResults.rows[0]);
+
+      } else {
+        superagent.get(url)
+          .query(queryParams) // superagent feature
+          .then(data => {
+              const geoData = data.body[0];
+              const finalLoc = new Location(city, geoData);
+
               let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
-              let safeValues = [city, finalObj.formatted_query, finalObj.latitude, finalObj.longitude];
+              let safeValues = [city, finalLoc.formatted_query, finalLoc.latitude, finalLoc.longitude];
+
               client.query(sqlQuery, safeValues);
-              response.status(200).send(finalObj);
-            })
-          }
-        }).catch(err => console.error(err));
-  });
+
+              response.status(200).send(finalLoc);
+            }).catch()
+      }}
+)};
+
+
+
+    
+
+
+// // GET LOCATION DATA
+// // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
+// app.get('/location', (request, response) => {
+//     let city = request.query.city;
+//     //console.log(city);
+//     let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
+
+//     // See if location already exists in DB
+//     let sqlQuery = 'SELECT * FROM location WHERE search_query = $1;';
+//     let safeValue = [city];
+
+//     client.query(sqlQuery, safeValue)
+//       .then(sqlResults => {
+//         //console.log(sqlResults);
+//         if (sqlResults.rowCount){   // checks if we get a row count back = true
+//           console.log('Getting info from the DATABASE');
+//           response.status(200).send(sqlResults.rows[0]);
+//         } else {
+//           superagent.get(url)
+//             .then(resultsFromSuperAgent => {
+//               console.log('Getting info from the API');
+//               let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
+//               let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
+//               let safeValues = [city, finalObj.formatted_query, finalObj.latitude, finalObj.longitude];
+//               client.query(sqlQuery, safeValues);
+//               response.status(200).send(finalObj);
+//             })
+//           }
+//         }).catch(err => console.error(err));
+//   });
 
 // GET WEATHER DATA
 // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it - using a forEach loop
@@ -105,6 +150,13 @@ app.get('/trails', (request, response) => {
       response.status(500).send(errorMessage_500);
   }
 })
+
+// 404 handler function
+function handleNotFound(request, response){
+  response.status(404).send('Sorry, this route does not exist.');
+}
+
+
 
 // Constructor function to normalize/re-create our JSON data, and ensure that each object is created according to the same format when server receives external data
 function Location(searchQuery, obj){
