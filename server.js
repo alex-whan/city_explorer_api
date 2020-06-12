@@ -37,6 +37,9 @@ app.get('/weather', weatherHandler);
 // Trails route
 app.get('/trails', trailsHandler);
 
+// Movie route
+app.get('/movies', movieHandler);
+
 // // Restaurant route
 // app.get('/restaurants', restaurantHandler);
 
@@ -45,7 +48,7 @@ app.use('*', handleNotFound);
 
 // Location handler
 function locationHandler(request, response){
-  let city = request.query.city;
+  const city = request.query.city;
   let url = 'https://us1.locationiq.com/v1/search.php';
 
   const queryParams = {
@@ -61,7 +64,7 @@ function locationHandler(request, response){
   client.query(sqlQuery, safeValue)
     .then(sqlResults => {
       if (sqlResults.rowCount){ // checks if we get a row count back
-        console.log('Getting info from the DATABASE');
+        console.log('Getting LOCATION info from the DATABASE');
         response.status(200).send(sqlResults.rows[0]);
 
       } else {
@@ -72,10 +75,11 @@ function locationHandler(request, response){
               const finalLoc = new Location(city, geoData);
 
               let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
-              let safeValues = [city, finalLoc.formatted_query, finalLoc.latitude, finalLoc.longitude];
+              let safeValue = [city, finalLoc.formatted_query, finalLoc.latitude, finalLoc.longitude];
 
-              client.query(sqlQuery, safeValues);
+              client.query(sqlQuery, safeValue);
 
+              console.log('Getting LOCATION info from the API');
               response.status(200).send(finalLoc);
             }).catch(err => console.log(err))
       }}
@@ -90,6 +94,7 @@ function weatherHandler(request, response){
   superagent.get(url)
     .then(resultsFromSuperAgent => {
       let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
+      console.log('Getting WEATHER info from the DATABASE');
       response.status(200).send(weatherArray);
     }).catch(err => console.log(err));
 };
@@ -106,9 +111,29 @@ function trailsHandler(request, response){
     .then(resultsFromSuperAgent => {
       let trailArray = resultsFromSuperAgent.body.trails.map(hike => {return new Trail(hike)
       });
+      console.log('Getting TRAILS info from the DATABASE');
       response.status(200).send(trailArray);
     }).catch(err => console.log(err));
+  };
+
+// Movie handler
+function movieHandler(request, response){
+  let city = request.query.search_query;
+  const url = 'https://api.themoviedb.org/3/search/movie/';
+
+  const queryParams = {
+    api_key: key,
+    query: city
+  }
+  
+  superagent.get(url)
+    .query(queryParams)
+    .then(resultsFromSuperAgent => {
+      const movieResults = resultsFromSuperAgent.body.results.map(film => new Movies(film));
+      response.status(200).send(movieResults);
+    }).catch(err => console.log(err));
 };
+
 
 // // Restaurant handler
 // function restaurantHandler(request, response){
@@ -149,24 +174,6 @@ function trailsHandler(request, response){
 //     })
 // };
 
-// // Movie handler
-// function movieHandler(request, response){
-//   let city = request.query.search_query;
-//   const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${city}`;
-
-//   superagent.get(url)
-//     .then(data => {
-//       const movieObject = data.body.results.map(obj => new Movie(obj));
-//       response.send(movieObject);
-//     });
-// };
-
-// const queryParams = {
-//   key: process.env.GEOCODE_API_KEY,
-//   q: city,
-//   format: 'json',
-//   limit: 1
-// }
 
 
 
@@ -205,15 +212,8 @@ function Trail(obj){
   this.condition_time = obj.conditionDate.slice(12, 19);
 }
 
-// Restaurant constructor
-function Restaurant(obj){
-  this.restaurant = obj.restaurant.name;
-  this.cuisines = obj.restaurant.cuisines;
-  this.locality = obj.restaurant.location.locality;
-}
-
 // Movie constructor
-function Movie(movieData){
+function Movies(movieData){
   this.title = movieData.original_title;
   this.overview = movieData.overview;
   this.average_votes = movieData.vote_average;
@@ -221,6 +221,14 @@ function Movie(movieData){
   this.popularity = movieData.popularity;
   this.released_on = movieData.release_date;
 }
+
+// Restaurant constructor
+function Restaurant(obj){
+  this.restaurant = obj.restaurant.name;
+  this.cuisines = obj.restaurant.cuisines;
+  this.locality = obj.restaurant.location.locality;
+}
+
 
 
 // // Catch-all (*) in case the route cannot be found
