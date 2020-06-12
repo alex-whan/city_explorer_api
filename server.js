@@ -40,8 +40,8 @@ app.get('/trails', trailsHandler);
 // Movie route
 app.get('/movies', movieHandler);
 
-// // Restaurant route
-// app.get('/restaurants', restaurantHandler);
+// Yelp route
+app.get('/yelp', yelpHandler);
 
 // "Use" will handle any GET, POST, UPDATE, DELETE requests
 app.use('*', handleNotFound);
@@ -129,45 +129,44 @@ function movieHandler(request, response){
     }).catch(err => console.log(err));
 };
 
+// Yelp handler
+function yelpHandler(request, response){
+  console.log('This is our YELP route', request);
 
-// // Restaurant handler
-// function restaurantHandler(request, response){
-//   console.log('This is our RESTAURANT route', request);
+  // Pagination
+  const page = request.query.page;
+  const numPerPage = 5;
+  const start = (page - 1) * numPerPage;
 
-//   // Pagination
-//   const page = request.query.page;
-//   const numPerPage = 5;
-//   const start = (page - 1) * numPerPage;
+  // needs to be YELP - check query params
+  const url = 'https://developers.zomato.com/api/v2.1/search'; 
 
-//   // needs to be YELP - check query params
-//   const url = 'https://developers.zomato.com/api/v2.1/search'; 
+  const queryParams = { // Params are from Zomato docs - similar to Yelp
+    lat: request.query.latitude,
+    start: start, // restaurant the list starts at
+    count: numPerPage, // how many it returns from starting point
+    lng: request.query.longitude
+  }
 
-//   const queryParams = { // Params are from Zomato docs - similar to Yelp
-//     lat: request.query.latitude,
-//     start: start, // restaurant the list starts at
-//     count: numPerPage, // how many it returns from starting point
-//     lng: request.query.longitude
-//   }
-
-//   // Superagent can SET HEADERS OF A RESPONSE (not with query, but with a different .word() - we'll need this for the Yelp API part of the lab today- Yelp requires you to put your KEY in a HEADER - check docs. Very similar to how we've set queries)
+  // Superagent can SET HEADERS OF A RESPONSE (not with query, but with a different .word() - we'll need this for the Yelp API part of the lab today- Yelp requires you to put your KEY in a HEADER - check docs. Very similar to how we've set queries)
   
-//  // In order to get key in header (you'll have to do this in Yelp although slightly differently - check documentation for something like "sending key in header"), do this:
+ // In order to get key in header (you'll have to do this in Yelp although slightly differently - check documentation for something like "sending key in header"), do this:
 
-//   superagent.get(url)
-//     .set('user-key', process.env.YELP_API_KEY)
-//     .query(queryParams)
-//     .then(data => {
-//       console.log('Restaurant data from SUPERAGENT', data.body);
-//       let restaurantArray = data.body.restaurants;
-//       console.log('This is my RESTAURANT ARRAY', restaurantArray[0]);
+  superagent.get(url)
+    .set('user-key', process.env.YELP_API_KEY)
+    .query(queryParams)
+    .then(data => {
+      console.log('Restaurant data from SUPERAGENT', data.body);
+      let restaurantArray = data.body.restaurants;
+      console.log('This is my RESTAURANT ARRAY', restaurantArray[0]);
 
-//       const finalRestaurants = restaurantArray.map(eatery => {
-//         return new Restaurant(eatery);
-//       })
+      const finalRestaurants = restaurantArray.map(eatery => {
+        return new Restaurant(eatery);
+      })
 
-//       response.status(200).send(finalRestaurants);
-//     })
-// };
+      response.status(200).send(finalRestaurants);
+    })
+};
 
 
 
@@ -208,13 +207,13 @@ function Trail(obj){
 }
 
 // Movie constructor
-function Movies(movieData){
-  this.title = movieData.original_title;
-  this.overview = movieData.overview;
-  this.average_votes = movieData.vote_average;
-  this.image_url = movieData.vote_count;
-  this.popularity = movieData.popularity;
-  this.released_on = movieData.release_date;
+function Movies(obj){
+  this.title = obj.original_title;
+  this.overview = obj.overview;
+  this.average_votes = obj.vote_average;
+  this.total_votes = obj.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/w500/${obj.poster_path}`;
+  this.released_on = obj.release_date;
 }
 
 // Restaurant constructor
