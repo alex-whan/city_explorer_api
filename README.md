@@ -57,6 +57,10 @@ User must run the following library installs in order to build and run this appl
 
 ![WRRC - Day 3 (Lab 8)](/images/Whiteboard_Lab8.JPG)
 
+#### Day 4 (Lab 9)
+
+![WRRC - Day 4 (Lab 9)](/images/Whiteboard_Lab9.JPG)
+
 <!-- Provide a detailed description of the application design. What technologies (languages, libraries, etc) you're using, and any other relevant design information. -->
 
 ## Change Log
@@ -217,5 +221,34 @@ User must run the following library installs in order to build and run this appl
 **Finish time:** 6:45pm
 
 **Actual time needed to complete:** 25 min
+
+-----
+
+## Day 4 (Lab 9)
+
+-----
+
+**Number and name of feature:** Feature 1 - Movies
+
+**Estimate of time needed to complete:** 1 hr
+
+**Start time:** 5:00pm
+
+**Finish time:**
+
+**Actual time needed to complete:**
+
+-----
+-----
+
+**Number and name of feature:** Feature 2 - Yelp
+
+**Estimate of time needed to complete:**
+
+**Start time:**
+
+**Finish time:**
+
+**Actual time needed to complete:**
 
 -----
