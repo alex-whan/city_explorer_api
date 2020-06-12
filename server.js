@@ -206,6 +206,7 @@ function Movies(obj){
   this.average_votes = obj.vote_average;
   this.total_votes = obj.vote_count;
   this.image_url = `https://image.tmdb.org/t/p/w500${obj.poster_path}`;
+  this.popularity = obj.popularity;
   this.released_on = (new Date(obj.release_date)).toLocaleDateString(); 
   // normalizes date to local format
 }
