@@ -165,15 +165,12 @@ function yelpHandler(request, response){
     })
 };
 
-
 // 404 handler function
 function handleNotFound(request, response){
   response.status(404).send('Sorry, this route does not exist.');
 }
 
-
-
-// Constructor function to normalize/re-create our JSON data, and ensure that each object is created according to the same format when server receives external data
+// Location constructor to normalize received JSON data
 function Location(searchQuery, obj){
   this.search_query = searchQuery;
   this.formatted_query = obj.display_name;
@@ -181,7 +178,7 @@ function Location(searchQuery, obj){
   this.longitude = obj.lon;
 }
 
-// Constructor function to normalize/re-create our JSON data from weather.json - taking in the "description" (forecast) and "valid_date" (date) of each daily weather prediction
+// Weather constructor
 function Weather(obj){
   this.forecast = obj.weather.description;
   this.time = obj.valid_date;
@@ -201,7 +198,7 @@ function Trail(obj){
   this.condition_time = obj.conditionDate.slice(12, 19);
 }
 
-// Movie constructor
+// Movies constructor
 function Movies(obj){
   this.title = obj.original_title;
   this.overview = obj.overview;
@@ -220,37 +217,9 @@ function Restaurant(obj){
   this.url = obj.url;
 }
 
-
-
-// // Catch-all (*) in case the route cannot be found
-// app.get('*', (request, response) => {
-//   response.status(404).send(errorMessage_404);
-// })
-
-// Fire up the actual server (turn on the lights, move into the house, start the server, and connect to DB
 client.connect()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Listening on ${PORT}`); 
   })
 })
-
-
-// With Yelp:
-  // We're going to do the EXACT same thing we just did, except with Yelp
-  // Use same process we just went through to SET THE HEADER
-  // Need to paginate some sort of results - just say: when they click "load more", make more results display on the page
-  // Yelp is by far the hardest API because of the key in the header
-  // Only need pagination with Yelp (movies and trails are MAYBE stretch goals if you wanted to add a button)
-
-  
-  // Write your routes from now on with the queryParams split up from the URL
-  // Refactor into separate handlers/app.get(); as we did in lab
-    // This is just good code and better writing
-    // No longer need try/catch blocks
-
-  // Need to incorporate DB functionality into these new functions, too
-  // Add movies from scratch
-  // Add Yelp from scratch
-    // Paginate Yelp
-  
