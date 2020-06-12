@@ -234,18 +234,18 @@ User must run the following library installs in order to build and run this appl
 
 **Start time:** 5:00pm
 
-**Finish time:**
+**Finish time:** 7:40pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 2 hr 40 min
 
 -----
 -----
 
 **Number and name of feature:** Feature 2 - Yelp
 
-**Estimate of time needed to complete:**
+**Estimate of time needed to complete:** 1 hr
 
-**Start time:**
+**Start time:** 7:40pm
 
 **Finish time:**
 
