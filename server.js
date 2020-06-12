@@ -49,7 +49,7 @@ app.use('*', handleNotFound);
 // Location handler
 function locationHandler(request, response){
   const city = request.query.city;
-  let url = 'https://us1.locationiq.com/v1/search.php';
+  const url = 'https://us1.locationiq.com/v1/search.php';
 
   const queryParams = {
     key: process.env.GEOCODE_API_KEY,
@@ -89,7 +89,7 @@ function locationHandler(request, response){
 function weatherHandler(request, response){
   let search_query = request.query.search_query;
 
-  let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${search_query}&key=${process.env.WEATHER_API_KEY}&days=8`;
+  const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${search_query}&key=${process.env.WEATHER_API_KEY}&days=8`;
 
   superagent.get(url)
     .then(resultsFromSuperAgent => {
@@ -105,7 +105,7 @@ function trailsHandler(request, response){
   let latitude = request.query.latitude;
   let longitude = request.query.longitude;
   
-  let url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
+  const url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
   
   superagent.get(url)
     .then(resultsFromSuperAgent => {
@@ -119,17 +119,12 @@ function trailsHandler(request, response){
 // Movie handler
 function movieHandler(request, response){
   let city = request.query.search_query;
-  const url = 'https://api.themoviedb.org/3/search/movie/';
-
-  const queryParams = {
-    api_key: key,
-    query: city
-  }
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${city}`;
   
   superagent.get(url)
-    .query(queryParams)
     .then(resultsFromSuperAgent => {
       const movieResults = resultsFromSuperAgent.body.results.map(film => new Movies(film));
+      console.log('Getting MOVIE info from the DATABASE');
       response.status(200).send(movieResults);
     }).catch(err => console.log(err));
 };
