@@ -218,9 +218,11 @@ function Movies(obj){
 
 // Restaurant constructor
 function Restaurant(obj){
-  this.restaurant = obj.restaurant.name;
-  this.cuisines = obj.restaurant.cuisines;
-  this.locality = obj.restaurant.location.locality;
+  this.name = obj.name;
+  this.image_url = obj.image_url;
+  this.price = obj.price;
+  this.rating = obj.rating;
+  this.url = obj.url;
 }
 
 
