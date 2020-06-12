@@ -94,7 +94,7 @@ function weatherHandler(request, response){
   superagent.get(url)
     .then(resultsFromSuperAgent => {
       let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
-      console.log('Getting WEATHER info from the DATABASE');
+      console.log('Getting WEATHER info from the API');
       response.status(200).send(weatherArray);
     }).catch(err => console.log(err));
 };
@@ -111,7 +111,7 @@ function trailsHandler(request, response){
     .then(resultsFromSuperAgent => {
       let trailArray = resultsFromSuperAgent.body.trails.map(hike => {return new Trail(hike)
       });
-      console.log('Getting TRAILS info from the DATABASE');
+      console.log('Getting TRAILS info from the API');
       response.status(200).send(trailArray);
     }).catch(err => console.log(err));
   };
@@ -124,28 +124,27 @@ function movieHandler(request, response){
   superagent.get(url)
     .then(resultsFromSuperAgent => {
       const movieResults = resultsFromSuperAgent.body.results.map(film => new Movies(film));
-      console.log('Getting MOVIE info from the DATABASE');
+      console.log('Getting MOVIE info from the API');
       response.status(200).send(movieResults);
     }).catch(err => console.log(err));
 };
 
 // Yelp handler
 function yelpHandler(request, response){
-  console.log('This is our YELP route', request);
+  let queryLatitude = request.query.latitude;
+  let queryLongitude = request.query.longitude;
+  const url = 'https://api.yelp.com/v3/businesses/search'; 
 
   // Pagination
   const page = request.query.page;
   const numPerPage = 5;
   const start = (page - 1) * numPerPage;
 
-  // needs to be YELP - check query params
-  const url = 'https://developers.zomato.com/api/v2.1/search'; 
-
-  const queryParams = { // Params are from Zomato docs - similar to Yelp
-    lat: request.query.latitude,
-    start: start, // restaurant the list starts at
-    count: numPerPage, // how many it returns from starting point
-    lng: request.query.longitude
+  const queryParams = {
+    latitude: queryLatitude,
+    longitude: queryLongitude,
+    offset: start, // restaurant the list starts at
+    limit: numPerPage, // how many it returns from starting point
   }
 
   // Superagent can SET HEADERS OF A RESPONSE (not with query, but with a different .word() - we'll need this for the Yelp API part of the lab today- Yelp requires you to put your KEY in a HEADER - check docs. Very similar to how we've set queries)
@@ -153,22 +152,18 @@ function yelpHandler(request, response){
  // In order to get key in header (you'll have to do this in Yelp although slightly differently - check documentation for something like "sending key in header"), do this:
 
   superagent.get(url)
-    .set('user-key', process.env.YELP_API_KEY)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`) // HTTP request
     .query(queryParams)
     .then(data => {
-      console.log('Restaurant data from SUPERAGENT', data.body);
-      let restaurantArray = data.body.restaurants;
-      console.log('This is my RESTAURANT ARRAY', restaurantArray[0]);
-
+      let restaurantArray = data.body.businesses;
       const finalRestaurants = restaurantArray.map(eatery => {
         return new Restaurant(eatery);
       })
 
+      console.log('Getting YELP info from the API');
       response.status(200).send(finalRestaurants);
     })
 };
-
-
 
 
 // 404 handler function
@@ -216,7 +211,7 @@ function Movies(obj){
   this.released_on = obj.release_date;
 }
 
-// Restaurant constructor
+// Yelp Restaurant constructor
 function Restaurant(obj){
   this.name = obj.name;
   this.image_url = obj.image_url;
