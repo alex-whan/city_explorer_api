@@ -31,11 +31,14 @@ const PORT = process.env.PORT || 3001;
 // Location route
 app.get('/location', locationHandler);
 
-// Restaurant route
-app.get('/restaurants', restaurantHandler);
+// Weather route
+app.get('/weather', weatherHandler);
 
 // Trails route
 app.get('/trails', trailsHandler);
+
+// // Restaurant route
+// app.get('/restaurants', restaurantHandler);
 
 // "Use" will handle any GET, POST, UPDATE, DELETE requests
 app.use('*', handleNotFound);
@@ -78,78 +81,79 @@ function locationHandler(request, response){
       }}
 )};
 
+// Weather handler
+function weatherHandler(request, response){
+  let search_query = request.query.search_query;
 
+  let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${search_query}&key=${process.env.WEATHER_API_KEY}&days=8`;
 
-    
+  superagent.get(url)
+    .then(resultsFromSuperAgent => {
+      let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
+      response.status(200).send(weatherArray);
+    }).catch(err => console.log(err));
+}
 
+// Trails handler
+function trailsHandler(request, response){
+  
+  let latitude = request.query.latitude;
+  let longitude = request.query.longitude;
+  
+  let url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
+  
+  superagent.get(url)
+    .then(resultsFromSuperAgent => {
+      let trailArray = resultsFromSuperAgent.body.trails.map(hike => {return new Trail(hike)
+      });
+      response.status(200).send(trailArray);
+    }).catch(err => console.log(err));
+}
 
-// // GET LOCATION DATA
-// // Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
-// app.get('/location', (request, response) => {
-//     let city = request.query.city;
-//     //console.log(city);
-//     let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
+// Restaurant handler
+function restaurantHandler(request, response){
+  console.log('This is our RESTAURANT route', request);
 
-//     // See if location already exists in DB
-//     let sqlQuery = 'SELECT * FROM location WHERE search_query = $1;';
-//     let safeValue = [city];
+  // Pagination
+  const page = request.query.page;
+  const numPerPage = 5;
+  const start = (page - 1) * numPerPage;
 
-//     client.query(sqlQuery, safeValue)
-//       .then(sqlResults => {
-//         //console.log(sqlResults);
-//         if (sqlResults.rowCount){   // checks if we get a row count back = true
-//           console.log('Getting info from the DATABASE');
-//           response.status(200).send(sqlResults.rows[0]);
-//         } else {
-//           superagent.get(url)
-//             .then(resultsFromSuperAgent => {
-//               console.log('Getting info from the API');
-//               let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
-//               let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
-//               let safeValues = [city, finalObj.formatted_query, finalObj.latitude, finalObj.longitude];
-//               client.query(sqlQuery, safeValues);
-//               response.status(200).send(finalObj);
-//             })
-//           }
-//         }).catch(err => console.error(err));
-//   });
+  // needs to be YELP - check query params
+  const url = 'https://developers.zomato.com/api/v2.1/search'; 
 
-// GET WEATHER DATA
-// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it - using a forEach loop
-app.get('/weather', (request, response) => {
-  try{
-    let search_query = request.query.search_query;
-
-    let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${search_query}&key=${process.env.WEATHER_API_KEY}&days=8`;
-
-    superagent.get(url)
-      .then(resultsFromSuperAgent => {
-        let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
-        response.status(200).send(weatherArray);
-      }).catch(err => console.log(err));
-  } catch(err){
-    response.status(500).send(errorMessage_500);
+  const queryParams = {
+    lat: request.query.latitude,
+    start: start, // restaurant the list starts at
+    count: numPerPage,
+    lng: request.query.longitude
   }
-})
 
-// GET TRAILS DATA
-app.get('/trails', (request, response) => {
-  try{
-    let latitude = request.query.latitude;
-    let longitude = request.query.longitude;
+  superagent.get(url)
+    .set('user-key', process.env.YELP_API_KEY)
+    .query(queryParams)
+    .then(data => {
+      console.log('Restaurant data from SUPERAGENT', data.body);
+      let restaurantArray = data.body.restaurants;
+      console.log('This is my RESTAURANT ARRAY', restaurantArray[0]);
 
-    let url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
+      const finalRestaurants = restaurantArray.map(eatery => {
+        return new Restaurant(eatery);
+      })
 
-    superagent.get(url)
-      .then(resultsFromSuperAgent => {
-        let trailArray = resultsFromSuperAgent.body.trails.map(hike => {return new Trail(hike)
-        });
-        response.status(200).send(trailArray);
-      }).catch(err => console.log(err));
-  } catch(err){
-      response.status(500).send(errorMessage_500);
-  }
-})
+      response.status(200).send(finalRestaurants);
+    })
+};
+
+
+// const queryParams = {
+//   key: process.env.GEOCODE_API_KEY,
+//   q: city,
+//   format: 'json',
+//   limit: 1
+// }
+
+
 
 // 404 handler function
 function handleNotFound(request, response){
@@ -193,10 +197,10 @@ function Restaurant(obj){
   this.locality = obj.restaurant.location.locality;
 }
 
-// Catch-all (*) in case the route cannot be found
-app.get('*', (request, response) => {
-  response.status(404).send(errorMessage_404);
-})
+// // Catch-all (*) in case the route cannot be found
+// app.get('*', (request, response) => {
+//   response.status(404).send(errorMessage_404);
+// })
 
 // Fire up the actual server (turn on the lights, move into the house, start the server, and connect to DB
 client.connect()
