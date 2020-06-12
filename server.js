@@ -1,10 +1,10 @@
 'use strict';
 
-// Global Error messages
-// 500 error message
-const errorMessage_500 = 'Sorry, something went wrong.';
-// 404 error message 
-const errorMessage_404 = 'Sorry, this route does not exist.';
+// // Global Error messages
+// // 500 error message
+// const errorMessage_500 = 'Sorry, something went wrong.';
+// // 404 error message 
+// const errorMessage_404 = 'Sorry, this route does not exist.';
 
 // Set up Express server and initialize Express into variable
 const express = require('express');
@@ -77,7 +77,7 @@ function locationHandler(request, response){
               client.query(sqlQuery, safeValues);
 
               response.status(200).send(finalLoc);
-            }).catch()
+            }).catch(err => console.log(err))
       }}
 )};
 
@@ -92,7 +92,7 @@ function weatherHandler(request, response){
       let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
       response.status(200).send(weatherArray);
     }).catch(err => console.log(err));
-}
+};
 
 // Trails handler
 function trailsHandler(request, response){
@@ -108,43 +108,58 @@ function trailsHandler(request, response){
       });
       response.status(200).send(trailArray);
     }).catch(err => console.log(err));
-}
-
-// Restaurant handler
-function restaurantHandler(request, response){
-  console.log('This is our RESTAURANT route', request);
-
-  // Pagination
-  const page = request.query.page;
-  const numPerPage = 5;
-  const start = (page - 1) * numPerPage;
-
-  // needs to be YELP - check query params
-  const url = 'https://developers.zomato.com/api/v2.1/search'; 
-
-  const queryParams = {
-    lat: request.query.latitude,
-    start: start, // restaurant the list starts at
-    count: numPerPage,
-    lng: request.query.longitude
-  }
-
-  superagent.get(url)
-    .set('user-key', process.env.YELP_API_KEY)
-    .query(queryParams)
-    .then(data => {
-      console.log('Restaurant data from SUPERAGENT', data.body);
-      let restaurantArray = data.body.restaurants;
-      console.log('This is my RESTAURANT ARRAY', restaurantArray[0]);
-
-      const finalRestaurants = restaurantArray.map(eatery => {
-        return new Restaurant(eatery);
-      })
-
-      response.status(200).send(finalRestaurants);
-    })
 };
 
+// // Restaurant handler
+// function restaurantHandler(request, response){
+//   console.log('This is our RESTAURANT route', request);
+
+//   // Pagination
+//   const page = request.query.page;
+//   const numPerPage = 5;
+//   const start = (page - 1) * numPerPage;
+
+//   // needs to be YELP - check query params
+//   const url = 'https://developers.zomato.com/api/v2.1/search'; 
+
+//   const queryParams = { // Params are from Zomato docs - similar to Yelp
+//     lat: request.query.latitude,
+//     start: start, // restaurant the list starts at
+//     count: numPerPage, // how many it returns from starting point
+//     lng: request.query.longitude
+//   }
+
+//   // Superagent can SET HEADERS OF A RESPONSE (not with query, but with a different .word() - we'll need this for the Yelp API part of the lab today- Yelp requires you to put your KEY in a HEADER - check docs. Very similar to how we've set queries)
+  
+//  // In order to get key in header (you'll have to do this in Yelp although slightly differently - check documentation for something like "sending key in header"), do this:
+
+//   superagent.get(url)
+//     .set('user-key', process.env.YELP_API_KEY)
+//     .query(queryParams)
+//     .then(data => {
+//       console.log('Restaurant data from SUPERAGENT', data.body);
+//       let restaurantArray = data.body.restaurants;
+//       console.log('This is my RESTAURANT ARRAY', restaurantArray[0]);
+
+//       const finalRestaurants = restaurantArray.map(eatery => {
+//         return new Restaurant(eatery);
+//       })
+
+//       response.status(200).send(finalRestaurants);
+//     })
+// };
+
+// // Movie handler
+// function movieHandler(request, response){
+//   let city = request.query.search_query;
+//   const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${city}`;
+
+//   superagent.get(url)
+//     .then(data => {
+//       const movieObject = data.body.results.map(obj => new Movie(obj));
+//       response.send(movieObject);
+//     });
+// };
 
 // const queryParams = {
 //   key: process.env.GEOCODE_API_KEY,
@@ -197,6 +212,17 @@ function Restaurant(obj){
   this.locality = obj.restaurant.location.locality;
 }
 
+// Movie constructor
+function Movie(movieData){
+  this.title = movieData.original_title;
+  this.overview = movieData.overview;
+  this.average_votes = movieData.vote_average;
+  this.image_url = movieData.vote_count;
+  this.popularity = movieData.popularity;
+  this.released_on = movieData.release_date;
+}
+
+
 // // Catch-all (*) in case the route cannot be found
 // app.get('*', (request, response) => {
 //   response.status(404).send(errorMessage_404);
@@ -209,3 +235,23 @@ client.connect()
       console.log(`Listening on ${PORT}`); 
   })
 })
+
+
+// With Yelp:
+  // We're going to do the EXACT same thing we just did, except with Yelp
+  // Use same process we just went through to SET THE HEADER
+  // Need to paginate some sort of results - just say: when they click "load more", make more results display on the page
+  // Yelp is by far the hardest API because of the key in the header
+  // Only need pagination with Yelp (movies and trails are MAYBE stretch goals if you wanted to add a button)
+
+  
+  // Write your routes from now on with the queryParams split up from the URL
+  // Refactor into separate handlers/app.get(); as we did in lab
+    // This is just good code and better writing
+    // No longer need try/catch blocks
+
+  // Need to incorporate DB functionality into these new functions, too
+  // Add movies from scratch
+  // Add Yelp from scratch
+    // Paginate Yelp
+  
