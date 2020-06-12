@@ -247,8 +247,8 @@ User must run the following library installs in order to build and run this appl
 
 **Start time:** 7:40pm
 
-**Finish time:**
+**Finish time:** 8:45pm
 
-**Actual time needed to complete:**
+**Actual time needed to complete:** 1 hr 5 min
 
 -----
