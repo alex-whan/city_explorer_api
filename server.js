@@ -1,112 +1,176 @@
 'use strict';
 
-// Global Error messages
-// 500 error message
-const errorMessage_500 = 'Sorry, something went wrong.';
-// 404 error message 
-const errorMessage_404 = 'Sorry, this route does not exist.';
+// // Global Error messages
+// // 500 error message
+// const errorMessage_500 = 'Sorry, something went wrong.';
+// // 404 error message 
+// const errorMessage_404 = 'Sorry, this route does not exist.';
 
-// Express library sets up our server
-// Bringing in a library takes TWO steps:
-  // 1) "Require" it (below)
-  // 2) Install it
+// Set up Express server and initialize Express into variable
 const express = require('express');
+const app = express();
 
-// "Bodyguard" of course server - indicates who is OK to send data to
+// Set up cors
 const cors = require('cors');
+app.use(cors());
 
-// bring in our SuperAgent library (goes out and gets data from internet)
-const superagent = require('superagent');
-
-// dotenv lets us get our secrets from our .env file
+// Set up and configure dotenv
 require('dotenv').config();
 
-// bring in and require out pg library (Postgres)
-const pg = require('pg');
+// Set up superagent
+const superagent = require('superagent');
 
-// Initializes our Express library into our variable called "app"
-const app = express();
+// Set up pg and database to connect to Postgres
+const pg = require('pg');
+const client = new pg.Client(process.env.DATABASE_URL);
+client.on('error', err => console.error(err));
 
 // Bring in the PORT by using process.env.variable name
 const PORT = process.env.PORT || 3001;
 
-// Tells CORS to let "app" work
-app.use(cors());
+// Location route
+app.get('/location', locationHandler);
 
-// Create a client and connect it to that Postgres DB
-const client = new pg.Client(process.env.DATABASE_URL);
-client.on('error', err => console.error(err));
+// Weather route
+app.get('/weather', weatherHandler);
 
+// Trails route
+app.get('/trails', trailsHandler);
 
-// GET LOCATION DATA
-// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it
-app.get('/location', (request, response) => {
-    let city = request.query.city;
-    //console.log(city);
-    let url = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${city}&format=json`;
+// Movie route
+app.get('/movies', movieHandler);
 
-    // See if location already exists in DB
-    let sqlQuery = 'SELECT * FROM location WHERE search_query = $1;';
-    let safeValue = [city];
+// Yelp route
+app.get('/yelp', yelpHandler);
 
-    client.query(sqlQuery, safeValue)
-      .then(sqlResults => {
-        //console.log(sqlResults);
-        if (sqlResults.rowCount){   // checks if we get a row count back = true
-          console.log('Getting info from the DATABASE');
-          response.status(200).send(sqlResults.rows[0]);
-        } else {
-          superagent.get(url)
-            .then(resultsFromSuperAgent => {
-              console.log('Getting info from the API');
-              let finalObj = new Location(city, resultsFromSuperAgent.body[0]);
+// "Use" will handle any GET, POST, UPDATE, DELETE requests
+app.use('*', handleNotFound);
+
+// Location handler
+function locationHandler(request, response){
+  const city = request.query.city;
+  const url = 'https://us1.locationiq.com/v1/search.php';
+
+  const queryParams = {
+    key: process.env.GEOCODE_API_KEY,
+    q: city,
+    format: 'json',
+    limit: 1
+  }
+
+  let sqlQuery = 'SELECT * FROM location WHERE search_query = $1;';
+  let safeValue = [city];
+
+  client.query(sqlQuery, safeValue)
+    .then(sqlResults => {
+      if (sqlResults.rowCount){ // checks if we get a row count back
+        console.log('Getting LOCATION info from the DATABASE');
+        response.status(200).send(sqlResults.rows[0]);
+
+      } else {
+        superagent.get(url)
+          .query(queryParams) // superagent feature
+          .then(data => {
+              const geoData = data.body[0];
+              const finalLoc = new Location(city, geoData);
+
               let sqlQuery = 'INSERT INTO location (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4);';
-              let safeValues = [city, finalObj.formatted_query, finalObj.latitude, finalObj.longitude];
-              client.query(sqlQuery, safeValues);
-              response.status(200).send(finalObj);
-            })
-          }
-        }).catch(err => console.error(err));
-  });
+              let safeValue = [city, finalLoc.formatted_query, finalLoc.latitude, finalLoc.longitude];
 
-// GET WEATHER DATA
-// Use the "app" variable and .get() method to get/return data along the '/location' route and run it through the constructor function to normalize it - using a forEach loop
-app.get('/weather', (request, response) => {
-  try{
-    let search_query = request.query.search_query;
+              client.query(sqlQuery, safeValue);
 
-    let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${search_query}&key=${process.env.WEATHER_API_KEY}&days=8`;
+              console.log('Getting LOCATION info from the API');
+              response.status(200).send(finalLoc);
+            }).catch(err => console.log(err))
+      }}
+)};
 
-    superagent.get(url)
-      .then(resultsFromSuperAgent => {
-        let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
-        response.status(200).send(weatherArray);
-      }).catch(err => console.log(err));
-  } catch(err){
-    response.status(500).send(errorMessage_500);
+// Weather handler
+function weatherHandler(request, response){
+  let search_query = request.query.search_query;
+
+  const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${search_query}&key=${process.env.WEATHER_API_KEY}&days=8`;
+
+  superagent.get(url)
+    .then(resultsFromSuperAgent => {
+      let weatherArray = resultsFromSuperAgent.body.data.map(day => new Weather(day));
+      console.log('Getting WEATHER info from the API');
+      response.status(200).send(weatherArray);
+    }).catch(err => console.log(err));
+};
+
+// Trails handler
+function trailsHandler(request, response){
+  
+  let latitude = request.query.latitude;
+  let longitude = request.query.longitude;
+  
+  const url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
+  
+  superagent.get(url)
+    .then(resultsFromSuperAgent => {
+      let trailArray = resultsFromSuperAgent.body.trails.map(hike => {return new Trail(hike)
+      });
+      console.log('Getting TRAILS info from the API');
+      response.status(200).send(trailArray);
+    }).catch(err => console.log(err));
+  };
+
+// Movie handler
+function movieHandler(request, response){
+  let city = request.query.search_query;
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${city}`;
+  
+  superagent.get(url)
+    .then(resultsFromSuperAgent => {
+      const movieResults = resultsFromSuperAgent.body.results.map(film => new Movies(film));
+      console.log('Getting MOVIE info from the API');
+      response.status(200).send(movieResults);
+    }).catch(err => console.log(err));
+};
+
+// Yelp handler
+function yelpHandler(request, response){
+  let queryLatitude = request.query.latitude;
+  let queryLongitude = request.query.longitude;
+  const url = 'https://api.yelp.com/v3/businesses/search'; 
+
+  // Pagination
+  const page = request.query.page;
+  const numPerPage = 5;
+  const start = (page - 1) * numPerPage;
+
+  const queryParams = {
+    latitude: queryLatitude,
+    longitude: queryLongitude,
+    offset: start, // restaurant the list starts at
+    limit: numPerPage, // how many it returns from starting point
   }
-})
 
-// GET TRAILS DATA
-app.get('/trails', (request, response) => {
-  try{
-    let latitude = request.query.latitude;
-    let longitude = request.query.longitude;
+  // Superagent can SET HEADERS OF A RESPONSE (not with query, but with a different .word() - we'll need this for the Yelp API part of the lab today- Yelp requires you to put your KEY in a HEADER - check docs. Very similar to how we've set queries)
+  
+ // In order to get key in header (you'll have to do this in Yelp although slightly differently - check documentation for something like "sending key in header"), do this:
 
-    let url = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&key=${process.env.TRAIL_API_KEY}`;
+  superagent.get(url)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`) // HTTP request
+    .query(queryParams)
+    .then(data => {
+      let restaurantArray = data.body.businesses;
+      const finalRestaurants = restaurantArray.map(eatery => {
+        return new Restaurant(eatery);
+      })
 
-    superagent.get(url)
-      .then(resultsFromSuperAgent => {
-        let trailArray = resultsFromSuperAgent.body.trails.map(hike => {return new Trail(hike)
-        });
-        response.status(200).send(trailArray);
-      }).catch(err => console.log(err));
-  } catch(err){
-      response.status(500).send(errorMessage_500);
-  }
-})
+      console.log('Getting YELP info from the API');
+      response.status(200).send(finalRestaurants);
+    })
+};
 
-// Constructor function to normalize/re-create our JSON data, and ensure that each object is created according to the same format when server receives external data
+// 404 handler function
+function handleNotFound(request, response){
+  response.status(404).send('Sorry, this route does not exist.');
+}
+
+// Location constructor to normalize received JSON data
 function Location(searchQuery, obj){
   this.search_query = searchQuery;
   this.formatted_query = obj.display_name;
@@ -114,7 +178,7 @@ function Location(searchQuery, obj){
   this.longitude = obj.lon;
 }
 
-// Constructor function to normalize/re-create our JSON data from weather.json - taking in the "description" (forecast) and "valid_date" (date) of each daily weather prediction
+// Weather constructor
 function Weather(obj){
   this.forecast = obj.weather.description;
   this.time = obj.valid_date;
@@ -134,12 +198,25 @@ function Trail(obj){
   this.condition_time = obj.conditionDate.slice(12, 19);
 }
 
-// Catch-all (*) in case the route cannot be found
-app.get('*', (request, response) => {
-  response.status(404).send(errorMessage_404);
-})
+// Movies constructor
+function Movies(obj){
+  this.title = obj.original_title;
+  this.overview = obj.overview;
+  this.average_votes = obj.vote_average;
+  this.total_votes = obj.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/w500${obj.poster_path}`;
+  this.released_on = obj.release_date;
+}
 
-// Fire up the actual server (turn on the lights, move into the house, start the server, and connect to DB
+// Yelp Restaurant constructor
+function Restaurant(obj){
+  this.name = obj.name;
+  this.image_url = obj.image_url;
+  this.price = obj.price;
+  this.rating = obj.rating;
+  this.url = obj.url;
+}
+
 client.connect()
   .then(() => {
     app.listen(PORT, () => {
