@@ -186,6 +186,13 @@ function Trail(obj){
   this.condition_time = obj.conditionDate.slice(12, 19);
 }
 
+// Restaurant constructor
+function Restaurant(obj){
+  this.restaurant = obj.restaurant.name;
+  this.cuisines = obj.restaurant.cuisines;
+  this.locality = obj.restaurant.location.locality;
+}
+
 // Catch-all (*) in case the route cannot be found
 app.get('*', (request, response) => {
   response.status(404).send(errorMessage_404);
